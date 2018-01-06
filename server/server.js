@@ -17,8 +17,15 @@ io.on('connection', (socket) => {
     console.log("New Client Connected to Server");
 
     socket.emit('newMessage', {
-        from: "random",
-        text: "lol ok"
+        from: "Admin",
+        text: "Welcome to the Chat Room",
+        createdAt: new Date()
+    });
+
+    socket.broadcast.emit('newMessage', {
+        from: "Admin",
+        text: "New User joined the Chat Room",
+        createdAt: new Date()
     });
 
     socket.on('disconnect', () => {
@@ -27,6 +34,11 @@ io.on('connection', (socket) => {
 
     socket.on('createMessage', (message) => {
         console.log("Created Message: ", message);
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date()
+        });
     });
 });
 
