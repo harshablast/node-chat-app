@@ -1,26 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <title>Flat HTML5/CSS3 Login Form</title>
+  
+  
+  
+      <link rel="stylesheet" href="css/style.css">
+
+  
 </head>
+
 <body>
-    <p>Welcome to My Chat App!</p>
 
-    <ol id="messages">
-
-    </ol>
-
-    <form id = "message-form">
-        <input name = "message" type = "text" placeholder="Enter Message Here"/>
-
-        <button>Send</button>
+  <div class="login-page">
+  <div class="form">
+    <form class="login-form">
+        <input type="text" placeholder="email"/>
+        <input type="password" placeholder="password"/>
+        <button>login</button>
+        <p class="message">Not registered? <a href="./register.html">Create an account</a></p>
     </form>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/libs/jquery-3.2.1.min.js"></script>
-    <script src="/js/index.js"></script>
-    <script src="/js/libs/moment.js"></script>
+    </div>
+</div>
+    <script src="js/libs/jquery-3.2.1.min.js"></script>
+    <script  src="js/index.js"></script>
 
 </body>
+
 </html>
