@@ -20,17 +20,17 @@ var UserSchema = new mongoose.Schema({
         type: String,
         require: true,
         minlength: 6
-    }
-    // tokens: [{
-    //     access: {
-    //         type: String,
-    //         required: true
-    //     },
-    //     token: {
-    //         type: String,
-    //         required: true
-    //     }
-    // }]
+    },
+    tokens: [{
+        access: {
+            type: String,
+            required: true
+        },
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 });
 
 UserSchema.methods.toJSON = function () {
@@ -43,7 +43,7 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
+    var token = jwt.sign({_id: user._id.toHexString(), access}, 'bitchesnshit').toString();
 
     user.tokens.push({access, token});
 
@@ -84,7 +84,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
 
     return User.findOne({email}).then((user) => {
         if (!user) {
-            return Promise.reject();
+            return Promise.reject('User does not exist');
         }
 
         return new Promise((resolve, reject) => {
@@ -93,27 +93,27 @@ UserSchema.statics.findByCredentials = function (email, password) {
                 if (res) {
                     resolve(user);
                 } else {
-                    reject();
+                    reject('Password Incorrect');
                 }
             });
         });
     });
 };
 
-// UserSchema.pre('save', function (next) {
-//     var user = this;
-//
-//     if (user.isModified('password')) {
-//         bcrypt.genSalt(10, (err, salt) => {
-//             bcrypt.hash(user.password, salt, (err, hash) => {
-//                 user.password = hash;
-//                 next();
-//             });
-//         });
-//     } else {
-//         next();
-//     }
-// });
+UserSchema.pre('save', function (next) {
+    var user = this;
+
+    if (user.isModified('password')) {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;
+                next();
+            });
+        });
+    } else {
+        next();
+    }
+});
 
 var User = mongoose.model('User', UserSchema);
 

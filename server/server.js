@@ -4,10 +4,12 @@ const express = require('express');
 const socketIO = require('socket.io');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 var {mongoose} = require('./db/mongoose');
 const {generateMessage} = require('./utils/message');
 var {User} = require('./models/users');
+var {authenticate} = require('./middleware/authenticate');
 
 const public_path = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -15,7 +17,9 @@ const port = process.env.PORT || 3000;
 var app = express();
 
 app.use(express.static(public_path));
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.use(cookieParser());
 
 // var server = http.createServer(app);
 // var io = socketIO(server);
@@ -38,6 +42,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 //     });
 // });
 
+app.get('/home', (req, res) => {
+    res.sendFile(public_path+'/home.html');
+})
 
 app.post('/users/register', (req, res) => {
     console.log(req.body);
@@ -51,7 +58,9 @@ app.post('/users/register', (req, res) => {
             console.log('No existing email. Proceed with registration');
             user.save().then(() => {
                 res.redirect('/');
-            })
+            }, (e) => {
+                console.log(e);
+            });
         }
         else {
             console.log('Email already exists!');
@@ -62,9 +71,23 @@ app.post('/users/register', (req, res) => {
     });
 });
 
-app.post('/users/login', (req, res) => {
+app.get('/home',authenticate, (req,res) => {
+    res.send(req.user);
+});
 
-})
+app.post('/users/login', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+
+    User.findByCredentials(body.email, body.password).then((user) => {
+            return user.generateAuthToken().then((token) => {
+            res.cookie('user-auth', token);
+            return res.redirect('/home');
+
+        });
+    },(err) => {
+        console.log(err);
+    })
+});
 
 app.listen(port, () => {
     console.log(`Server is up on port: ${port}`);
