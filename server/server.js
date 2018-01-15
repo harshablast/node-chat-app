@@ -44,7 +44,11 @@ app.use(cookieParser());
 
 app.get('/home', (req, res) => {
     res.sendFile(public_path+'/home.html');
-})
+});
+
+app.get('/chatlist', (req, res) => {
+    res.sendFile(public_path+'/chatlist.html');
+});
 
 app.post('/users/register', (req, res) => {
     console.log(req.body);
