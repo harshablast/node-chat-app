@@ -10,7 +10,7 @@ var {mongoose} = require('./db/mongoose');
 const {generateMessage} = require('./utils/message');
 var {User} = require('./models/users');
 var {authenticate} = require('./middleware/authenticate');
-var chatListGen = require('./utils/chatListGen');
+var userUtils = require('./utils/userUtils');
 
 const public_path = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -54,7 +54,7 @@ app.get('/chatlist', authenticate , (req, res) => {
 app.get('/userslist', (req, res) => {
     console.log("/userslist route is called");
 
-    chatListGen.generateUsers().then((usersJson)=> {
+    userUtils.generateUsers().then((usersJson)=> {
         res.header('Content-type','application/json');
         res.send(JSON.stringify(usersJson));
     }, (err)=> {
