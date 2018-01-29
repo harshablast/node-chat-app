@@ -10,6 +10,7 @@ var {mongoose} = require('./db/mongoose');
 const {generateMessage} = require('./utils/message');
 var {User} = require('./models/users');
 var {authenticate} = require('./middleware/authenticate');
+var chatListGen = require('./utils/chatListGen');
 
 const public_path = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -42,12 +43,28 @@ app.use(cookieParser());
 //     });
 // });
 
-app.get('/home', (req, res) => {
+app.get('/home', authenticate, (req, res) => {
     res.sendFile(public_path+'/home.html');
 });
 
-app.get('/chatlist', (req, res) => {
+app.get('/chatlist', authenticate , (req, res) => {
     res.sendFile(public_path+'/chatlist.html');
+});
+
+app.get('/userslist', (req, res) => {
+    console.log("/userslist route is called");
+
+    chatListGen.generateUsers().then((usersJson)=> {
+        res.header('Content-type','application/json');
+        res.send(JSON.stringify(usersJson));
+    }, (err)=> {
+        console.log(err);
+    });
+
+});
+
+app.get('/messages/:userID', (req,res) => {
+   res.send("Opened Messages of: " + req.params.userID);
 });
 
 app.post('/users/register', (req, res) => {
@@ -93,9 +110,12 @@ app.post('/users/login', (req, res) => {
     })
 });
 
+
 app.listen(port, () => {
     console.log(`Server is up on port: ${port}`);
 });
+
+
 
 
 

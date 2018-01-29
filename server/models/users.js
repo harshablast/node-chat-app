@@ -43,9 +43,19 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({_id: user._id.toHexString(), access}, 'bitchesnshit').toString();
 
-    user.tokens.push({access, token});
+    console.log(user.tokens);
+
+    if((user.tokens.length === 0)){
+
+        var token = jwt.sign({_id: user._id.toHexString(), access}, 'bitchesnshit').toString();
+        user.tokens.push({access, token});
+    }
+    else{
+        token = user.tokens[0]['token'];
+    }
+
+
 
     return user.save().then(() => {
         return token;
@@ -67,7 +77,7 @@ UserSchema.statics.findByToken = function (token) {
     var decoded;
 
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        decoded = jwt.verify(token, "bitchesnshit");
     } catch (e) {
         return Promise.reject();
     }
